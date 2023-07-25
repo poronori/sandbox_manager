@@ -35,7 +35,7 @@ class DatabaseManager {
   static Future<List<DataModel>> getData() async {
     final Database db = await database;
     final List<Map<String, dynamic>> maps = await db.query('sandbox');
-    return List.generate(maps.length, (i) {
+    List<DataModel> dataList = List.generate(maps.length, (i) {
       return DataModel(
         id: maps[i]['id'],
         xAxis: maps[i]['xAxis'],
@@ -45,6 +45,8 @@ class DatabaseManager {
         image: maps[i]['image'],
       );
     });
+    // 新しい順に表示するために逆順にする
+    return List.from(dataList.reversed); 
   }
 
   // 更新

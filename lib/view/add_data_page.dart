@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
+import 'package:provider/provider.dart';
 
 import '../model/data_model.dart';
+import '../model/database_manager.dart';
+import '../provider/data_list_provider.dart';
+import '../view_model/add_data_model.dart';
 
 class AddDataPage extends StatefulWidget {
   const AddDataPage({super.key});
@@ -20,8 +25,25 @@ class _AddDataPageState extends State<AddDataPage> {
   String image = '';
 
   final _formKey = GlobalKey<FormState>();
-  final _scrollController = ItemScrollController();
+  final _scrollController = ScrollController();
 
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+/*
+  void textScroll() {
+    Future.delayed(const Duration(seconds: 1), () {
+    _scrollController.animateTo(
+      _scrollController.position.maxScrollExtent,
+      duration: const Duration(milliseconds: 100),
+      curve: Curves.linear,
+    );
+    });
+  }
+*/
   @override
   Widget build(BuildContext context) {
     // 画面サイズ
@@ -30,6 +52,18 @@ class _AddDataPageState extends State<AddDataPage> {
 
     // キーボードサイズ
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+
+    // キーボードが表示されたら一番下までスクロール
+    if (keyboardHeight != 0) {
+      WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+        _scrollController.animateTo(
+          _scrollController.position.maxScrollExtent,
+          duration: const Duration(milliseconds: 100),
+          curve: Curves.linear,
+        );
+      });
+    }
+    ;
 
     return ConstrainedBox(
       constraints: BoxConstraints(
@@ -50,19 +84,35 @@ class _AddDataPageState extends State<AddDataPage> {
             ),
           ),
           // ×ボタン
-          Container(
-            alignment: Alignment.centerRight,
-            child: IconButton(
-              onPressed: () => Navigator.of(context).pop(),
-              icon: Icon(Icons.close,
-                  color: const Color(0xFF090444), size: width * 0.06),
-            ),
+          Stack(
+            children: [
+              Container(
+                alignment: Alignment.center,
+                child: const Text(
+                  '新規追加',
+                  style: TextStyle(
+                    color: Colors.blueAccent,
+                    fontSize: 30,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Container(
+                alignment: Alignment.centerRight,
+                child: IconButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  icon: Icon(Icons.close,
+                      color: const Color(0xFF090444), size: width * 0.06),
+                ),
+              ),
+            ],
           ),
           Expanded(
             child: LayoutBuilder(builder: (context, constraints) {
               return Form(
                 key: _formKey,
                 child: SingleChildScrollView(
+                  controller: _scrollController,
                   child: ConstrainedBox(
                     constraints: BoxConstraints(
                       minHeight: constraints.maxHeight,
@@ -74,37 +124,60 @@ class _AddDataPageState extends State<AddDataPage> {
                       child: Column(
                         children: [
                           Container(
-                            height: 300,
+                            height: 250,
                             decoration: BoxDecoration(
                               border: Border.all(color: Colors.red),
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
                           Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Flexible(
-                                child: TextFormField(
-                                    decoration: InputDecoration(
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                        borderSide: const BorderSide(
-                                          color: Colors.amber,
+                                child: Container(
+                                  margin:
+                                      const EdgeInsets.fromLTRB(5, 10, 5, 10),
+                                  child: TextFormField(
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.digitsOnly
+                                      ],
+                                      textInputAction: TextInputAction.next,
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      validator: ValidateText.validate,
+                                      decoration: InputDecoration(
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          borderSide: const BorderSide(
+                                            color: Colors.amber,
+                                          ),
                                         ),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                        borderSide: const BorderSide(
-                                          color: Colors.blue,
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          borderSide: const BorderSide(
+                                            color: Colors.blue,
+                                          ),
                                         ),
+                                        labelText: 'x座標',
                                       ),
-                                      labelText: 'x座標',
-                                    ),
-                                    onSaved: (value) async {
-                                      xAxis = value!;
-                                    }),
+                                      onSaved: (value) async {
+                                        xAxis = value!;
+                                      }),
+                                ),
                               ),
                               Flexible(
                                 child: TextFormField(
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.digitsOnly
+                                    ],
+                                    textInputAction: TextInputAction.next,
+                                    autovalidateMode:
+                                        AutovalidateMode.onUserInteraction,
+                                    validator: ValidateText.validate,
                                     decoration: InputDecoration(
                                       enabledBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(15),
@@ -125,47 +198,64 @@ class _AddDataPageState extends State<AddDataPage> {
                                     }),
                               ),
                               Flexible(
-                                child: TextFormField(
-                                    decoration: InputDecoration(
-                                      enabledBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                        borderSide: const BorderSide(
-                                          color: Colors.amber,
+                                child: Container(
+                                  margin:
+                                      const EdgeInsets.fromLTRB(5, 10, 5, 10),
+                                  child: TextFormField(
+                                      keyboardType: TextInputType.number,
+                                      inputFormatters: [
+                                        FilteringTextInputFormatter.digitsOnly
+                                      ],
+                                      textInputAction: TextInputAction.next,
+                                      autovalidateMode:
+                                          AutovalidateMode.onUserInteraction,
+                                      validator: ValidateText.validate,
+                                      decoration: InputDecoration(
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          borderSide: const BorderSide(
+                                            color: Colors.amber,
+                                          ),
                                         ),
-                                      ),
-                                      focusedBorder: OutlineInputBorder(
-                                        borderRadius: BorderRadius.circular(15),
-                                        borderSide: const BorderSide(
-                                          color: Colors.blue,
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(15),
+                                          borderSide: const BorderSide(
+                                            color: Colors.blue,
+                                          ),
                                         ),
+                                        labelText: 'z座標',
                                       ),
-                                      labelText: 'z座標',
-                                    ),
-                                    onSaved: (value) async {
-                                      zAxis = value!;
-                                    }),
+                                      onSaved: (value) async {
+                                        zAxis = value!;
+                                      }),
+                                ),
                               ),
                             ],
                           ),
-                          TextFormField(
-                              decoration: InputDecoration(
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                  borderSide: const BorderSide(
-                                    color: Colors.amber,
+                          Container(
+                            margin: const EdgeInsets.all(5),
+                            child: TextFormField(
+                                decoration: InputDecoration(
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                    borderSide: const BorderSide(
+                                      color: Colors.amber,
+                                    ),
                                   ),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                  borderSide: const BorderSide(
-                                    color: Colors.blue,
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(15),
+                                    borderSide: const BorderSide(
+                                      color: Colors.blue,
+                                    ),
                                   ),
+                                  labelText: 'メモ',
                                 ),
-                                labelText: 'メモ',
-                              ),
-                              onSaved: (value) async {
-                                memo = value!;
-                              }),
+                                onSaved: (value) async {
+                                  memo = value!;
+                                }),
+                          ),
                           // 追加ボタン
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
@@ -189,6 +279,17 @@ class _AddDataPageState extends State<AddDataPage> {
   }
 
   void _saved() {
-    _formKey.currentState!.save();
+    if (_formKey.currentState!.validate()) {
+      _formKey.currentState!.save();
+      DataModel data = DataModel(
+        xAxis: xAxis,
+        yAxis: yAxis,
+        zAxis: zAxis,
+        memo: memo,
+      );
+      DataListProvider provider = context.read<DataListProvider>();
+      provider.addDataList(data);
+      Navigator.of(context).pop();
+    }
   }
 }
