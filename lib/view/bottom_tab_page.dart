@@ -36,7 +36,7 @@ class _BottomTabPageState extends State<BottomTabPage> {
           IconButton(
             icon: const Icon(Icons.add),
             onPressed: () async {
-              var result = await showModalBottomSheet(
+              showModalBottomSheet(
                 context: context,
                 isScrollControlled: true,
                 shape: const RoundedRectangleBorder(

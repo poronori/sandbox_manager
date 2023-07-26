@@ -16,17 +16,43 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return FlutterMap(
       options: MapOptions(
-        center: latLng.LatLng(32.74472, 129.87361),
-        zoom: 16.0,
-        maxZoom: 17.0,
-        minZoom: 3.0,
+        center: latLng.LatLng(0, 0),
+        zoom: 15.0,
+        maxZoom: 18.0,
+        minZoom: 2.0,
       ),
       children: [
         TileLayer(
-          //urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+          urlTemplate: "assets/grid.png",
           tileProvider: AssetTileProvider(),
-          subdomains: const ['a', 'b', 'c'],
-          retinaMode: true,
+        ),
+        /*
+        0.00001度 = 1mとして考える
+        */
+        MarkerLayer(
+          markers: [
+            Marker(
+              point: latLng.LatLng(0, 0),
+              builder: (ctx) => const Icon(
+                Icons.location_pin,
+                color: Colors.redAccent,
+              ),
+            ),
+            Marker(
+              point: latLng.LatLng(0.001, 0),
+              builder: (ctx) => const Icon(
+                Icons.location_pin,
+                color: Colors.redAccent,
+              ),
+            ),
+            Marker(
+              point: latLng.LatLng(0, 0.019),
+              builder: (ctx) => const Icon(
+                Icons.location_pin,
+                color: Colors.redAccent,
+              ),
+            ),
+          ],
         ),
       ],
     );
