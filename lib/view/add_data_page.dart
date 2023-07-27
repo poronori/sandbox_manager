@@ -23,6 +23,7 @@ class _AddDataPageState extends State<AddDataPage> {
   String zAxis = '';
   String memo = '';
   String image = '';
+  String type = TypeList.others.name;
 
   final _formKey = GlobalKey<FormState>();
   final _scrollController = ScrollController();
@@ -130,13 +131,42 @@ class _AddDataPageState extends State<AddDataPage> {
                               borderRadius: BorderRadius.circular(10),
                             ),
                           ),
+                          // タイプの選択
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: [
+                              Flexible(
+                                child: Container(
+                                  margin: const EdgeInsets.all(5),
+                                  child: const Text('タイプ：'),
+                                ),
+                              ),
+                              Flexible(
+                                child: DropdownButton(
+                                  items: TypeList.values.map((TypeList type) {
+                                    return DropdownMenuItem(
+                                      value: type.name,
+                                      child: Text(type.name),
+                                    );
+                                  }).toList(),
+                                  value: type,
+                                  onChanged:(value) {
+                                    setState(() {
+                                      type = value!;
+                                    });
+                                  },
+                                  isExpanded: true,
+                                ),
+                              ),
+                            ]
+                          ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Flexible(
                                 child: Container(
                                   margin:
-                                      const EdgeInsets.fromLTRB(5, 10, 5, 10),
+                                      const EdgeInsets.fromLTRB(5, 0, 5, 0),
                                   child: TextFormField(
                                       keyboardType: TextInputType.number,
                                       inputFormatters: [
@@ -200,7 +230,7 @@ class _AddDataPageState extends State<AddDataPage> {
                               Flexible(
                                 child: Container(
                                   margin:
-                                      const EdgeInsets.fromLTRB(5, 10, 5, 10),
+                                      const EdgeInsets.fromLTRB(5, 0, 5, 0),
                                   child: TextFormField(
                                       keyboardType: TextInputType.number,
                                       inputFormatters: [
@@ -256,6 +286,7 @@ class _AddDataPageState extends State<AddDataPage> {
                                   memo = value!;
                                 }),
                           ),
+
                           // 追加ボタン
                           ElevatedButton(
                             style: ElevatedButton.styleFrom(
@@ -286,6 +317,8 @@ class _AddDataPageState extends State<AddDataPage> {
         yAxis: yAxis,
         zAxis: zAxis,
         memo: memo,
+        image: '',
+        type: type,
       );
       DataListProvider provider = context.read<DataListProvider>();
       provider.addDataList(data);

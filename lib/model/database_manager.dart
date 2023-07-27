@@ -12,7 +12,7 @@ class DatabaseManager {
       onCreate: (db, version) {
         return db.execute(
           // テーブル作成
-          "CREATE TABLE sandbox(id INTEGER PRIMARY KEY AUTOINCREMENT, xAxis TEXT, yAxis TEXT, zAxis TEXT, memo TEXT, image TEXT)",
+          "CREATE TABLE sandbox(id INTEGER PRIMARY KEY AUTOINCREMENT, xAxis TEXT, yAxis TEXT, zAxis TEXT, memo TEXT, image TEXT, type TEXT)",
         );
       },
       version: 1,
@@ -43,6 +43,7 @@ class DatabaseManager {
         zAxis: maps[i]['zAxis'],
         memo: maps[i]['memo'],
         image: maps[i]['image'],
+        type: maps[i]['type'],
       );
     });
     // 新しい順に表示するために逆順にする

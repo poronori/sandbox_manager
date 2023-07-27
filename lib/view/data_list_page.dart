@@ -16,6 +16,24 @@ class DataListPage extends StatelessWidget {
         itemCount: provider.dataList.length,
         itemBuilder: (context, index) {
           DataModel data = provider.dataList[index];
+
+          Icon icon;
+          if (data.type == TypeList.home.name) {
+            icon = TypeList.home.icon;
+          } else if (data.type == TypeList.homeSub.name) {
+            icon = TypeList.homeSub.icon;
+          } else if (data.type == TypeList.village.name) {
+            icon = TypeList.village.icon;
+          } else if (data.type == TypeList.building.name) {
+            icon = TypeList.building.icon;
+          } else if (data.type == TypeList.cave.name) {
+            icon = TypeList.cave.icon;
+          } else if (data.type == TypeList.biome.name) {
+            icon = TypeList.biome.icon;
+          } else {
+            icon = TypeList.others.icon;
+          }
+
           return Dismissible(
             key: UniqueKey(),
             onDismissed: (DismissDirection direction) {
@@ -54,14 +72,15 @@ class DataListPage extends StatelessWidget {
                 // メモ
                 title: Text(
                   data.memo ?? '', // nullの場合は空文字
-                  style: const TextStyle(fontSize: 30),
+                  style: const TextStyle(fontSize: 25),
                   overflow: TextOverflow.ellipsis, // 名前が長すぎる場合は切る
                 ),
                 // 座標
                 subtitle: Text(
                   '${data.xAxis}, ${data.yAxis}, ${data.zAxis}',
-                  style: const TextStyle(fontSize: 30),
+                  style: const TextStyle(fontSize: 15),
                 ),
+                leading: icon,
               ),
             ),
           );
