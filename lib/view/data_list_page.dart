@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:sandbox_manager/view/edit_data_page.dart';
 
 import '../model/data_model.dart';
 import '../provider/data_list_provider.dart';
@@ -81,6 +82,16 @@ class DataListPage extends StatelessWidget {
                   style: const TextStyle(fontSize: 15),
                 ),
                 leading: icon,
+                onTap:() {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                    ),
+                    builder: (context) => EditDataPage(data: data),
+                  );
+                },
               ),
             ),
           );

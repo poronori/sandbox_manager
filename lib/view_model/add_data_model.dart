@@ -6,7 +6,7 @@ class ValidateText {
     if (value.isEmpty) {
       return '値が未設定です';
     }
-    if (value.length > 8) {
+    if (RegExp(r'-?[0-9]{8}').hasMatch(value)) {
       return '7桁以下にしてください';
     }
 

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart' as latLng;
@@ -5,6 +7,7 @@ import 'package:provider/provider.dart';
 
 import '../model/data_model.dart';
 import '../provider/data_list_provider.dart';
+import 'edit_data_page.dart';
 
 class MapPage extends StatefulWidget {
   const MapPage({super.key});
@@ -15,20 +18,27 @@ class MapPage extends StatefulWidget {
 
 class _MapPageState extends State<MapPage> {
 
+  // タイル
   Widget _buildTile(BuildContext context, Widget tileWidget, TileImage tile) {
+
+    // zoom値16を起点にして、ピクセル座標を計算する
+    int zoom = tile.coordinates.z;
+    num xAxis = pow(2, (16 - zoom)) * tile.coordinates.x * 256;
+    num zAxis = pow(2, (16 - zoom)) * tile.coordinates.y * -256;
+
     return Stack(
+      fit: StackFit.expand, // zoomしたときの歪みを消す
       children: [
-        Image(image: tile.imageProvider),
-        Text('(${tile.coordinates.x}, ${tile.coordinates.y})'),
+        Image(image: tile.imageProvider, fit: BoxFit.cover,),
+        Text('(${xAxis.toString()}, ${zAxis.toString()})'),
       ],);
   }
-
 
   @override
   Widget build(BuildContext context) {
     latLng.LatLng center = latLng.LatLng(0,0);
     DataListProvider provider = context.watch<DataListProvider>();
-    CrsSimple crs = CrsSimple();
+    CrsSimple crs = CrsSimple(); // 平面地図を使う
 
     // 拠点が設定されていればセンターにもってくる
     for (var data in provider.dataList) {
@@ -74,7 +84,19 @@ class _MapPageState extends State<MapPage> {
                   return Stack(
                     alignment: Alignment.center,
                     children: [
-                      icon,
+                      InkWell(
+                        onTap:() {
+                          showModalBottomSheet(
+                            context: context,
+                            isScrollControlled: true,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                            ),
+                            builder: (context) => EditDataPage(data: data),
+                          );
+                        },
+                        child: icon,
+                      ),
                       Container(
                         alignment: Alignment.bottomCenter,
                         child: Text(
@@ -84,7 +106,7 @@ class _MapPageState extends State<MapPage> {
                         ),
                       ),
                     ],
-                  );;
+                  );
                 },
               );
             }

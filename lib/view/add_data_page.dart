@@ -169,9 +169,6 @@ class _AddDataPageState extends State<AddDataPage> {
                                       const EdgeInsets.fromLTRB(5, 0, 5, 0),
                                   child: TextFormField(
                                       keyboardType: TextInputType.number,
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.digitsOnly
-                                      ],
                                       textInputAction: TextInputAction.next,
                                       autovalidateMode:
                                           AutovalidateMode.onUserInteraction,
@@ -201,9 +198,6 @@ class _AddDataPageState extends State<AddDataPage> {
                               Flexible(
                                 child: TextFormField(
                                     keyboardType: TextInputType.number,
-                                    inputFormatters: [
-                                      FilteringTextInputFormatter.digitsOnly
-                                    ],
                                     textInputAction: TextInputAction.next,
                                     autovalidateMode:
                                         AutovalidateMode.onUserInteraction,
@@ -233,9 +227,6 @@ class _AddDataPageState extends State<AddDataPage> {
                                       const EdgeInsets.fromLTRB(5, 0, 5, 0),
                                   child: TextFormField(
                                       keyboardType: TextInputType.number,
-                                      inputFormatters: [
-                                        FilteringTextInputFormatter.digitsOnly
-                                      ],
                                       textInputAction: TextInputAction.next,
                                       autovalidateMode:
                                           AutovalidateMode.onUserInteraction,

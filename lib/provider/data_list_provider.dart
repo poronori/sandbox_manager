@@ -32,7 +32,7 @@ class DataListProvider extends ChangeNotifier {
   }
 
   // データ更新
-  void updateDataList(int index, DataModel data) async {
+  void updateDataList(DataModel data) async {
     await DatabaseManager.updateData(data);
     await init();
     notifyListeners();
