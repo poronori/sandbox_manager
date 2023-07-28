@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:sandbox_manager/view/edit_data_page.dart';
 
 import '../model/data_model.dart';
+import '../model/image_manager.dart';
 import '../provider/data_list_provider.dart';
 
 class DataListPage extends StatelessWidget {
@@ -39,6 +40,11 @@ class DataListPage extends StatelessWidget {
             key: UniqueKey(),
             onDismissed: (DismissDirection direction) {
               provider.deleteDataList(data);
+              // 画像が設定されていれば削除
+              String image = data.image ?? '';
+              if (image.isNotEmpty) {
+                ImageManager.deleteImage(image);
+              }
             },
             // 削除時の確認ダイアログ
             confirmDismiss: (direction) async {

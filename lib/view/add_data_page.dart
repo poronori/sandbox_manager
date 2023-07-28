@@ -1,12 +1,17 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:provider/provider.dart';
 
 import '../model/data_model.dart';
 import '../model/database_manager.dart';
+import '../model/image_manager.dart';
 import '../provider/data_list_provider.dart';
 import '../view_model/add_data_model.dart';
 
@@ -22,8 +27,8 @@ class _AddDataPageState extends State<AddDataPage> {
   String yAxis = '';
   String zAxis = '';
   String memo = '';
-  String image = '';
   String type = TypeList.others.name;
+  File? _image;
 
   final _formKey = GlobalKey<FormState>();
   final _scrollController = ScrollController();
@@ -34,17 +39,6 @@ class _AddDataPageState extends State<AddDataPage> {
     super.dispose();
   }
 
-/*
-  void textScroll() {
-    Future.delayed(const Duration(seconds: 1), () {
-    _scrollController.animateTo(
-      _scrollController.position.maxScrollExtent,
-      duration: const Duration(milliseconds: 100),
-      curve: Curves.linear,
-    );
-    });
-  }
-*/
   @override
   Widget build(BuildContext context) {
     // 画面サイズ
@@ -64,7 +58,6 @@ class _AddDataPageState extends State<AddDataPage> {
         );
       });
     }
-    ;
 
     return ConstrainedBox(
       constraints: BoxConstraints(
@@ -124,12 +117,32 @@ class _AddDataPageState extends State<AddDataPage> {
                       margin: const EdgeInsets.only(left: 5, right: 5),
                       child: Column(
                         children: [
-                          Container(
-                            height: 250,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.red),
-                              borderRadius: BorderRadius.circular(10),
+                          InkWell(
+                            child: Container(
+                              child: _image == null 
+                              // 画像がないとき
+                              ? Container(
+                                  alignment: Alignment.center,
+                                  height: 250,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.grey,
+                                  ),
+                                  child: const Text('タップで画像を追加', style: TextStyle(color: Colors.white)),
+                                )
+                                // 画像が設定されたとき
+                              : Container(
+                                  alignment: Alignment.center,
+                                  height: 250,
+                                  child: Image.file(_image!),
+                                )
                             ),
+                            onTap:() async {
+                              final image = await ImagePicker().pickImage(source: ImageSource.gallery);
+                              if (image == null) return;
+                              setState(() {
+                                _image = File(image.path);
+                              });
+                            },
                           ),
                           // タイプの選択
                           Row(
@@ -303,14 +316,24 @@ class _AddDataPageState extends State<AddDataPage> {
   void _saved() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
+      // 画像があればファイル名を現在日時にして保存する
+      String imageName = '';
+      if (_image != null) {
+        imageName = DateFormat('yyyyMMddHHmmss').format(DateTime.now()).toString();
+        ImageManager.saveImage(_image!, imageName);
+        print('$imageName保存');
+      }
+
       DataModel data = DataModel(
         xAxis: xAxis,
         yAxis: yAxis,
         zAxis: zAxis,
         memo: memo,
-        image: '',
+        image: imageName,
         type: type,
       );
+
       DataListProvider provider = context.read<DataListProvider>();
       provider.addDataList(data);
       Navigator.of(context).pop();

@@ -40,6 +40,9 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_map: ^4.0.0
   latlong: ^0.6.1
+  path_provider: ^2.0.15
+  intl: ^0.18.1
+  image_picker: ^1.0.1
 
 dev_dependencies:
   flutter_test:

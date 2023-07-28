@@ -1,7 +1,13 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/placeholder.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
+import 'package:sandbox_manager/model/image_manager.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:provider/provider.dart';
 
@@ -25,8 +31,10 @@ class _EditDataPageState extends State<EditDataPage> {
   String yAxis = '';
   String zAxis = '';
   String memo = '';
-  String image = '';
   String type = TypeList.others.name;
+  String image = '';
+  File? _imageFile;
+  bool imageChangeFlg = false; // 画像が変更されたか
 
   final _formKey = GlobalKey<FormState>();
   final _scrollController = ScrollController();
@@ -45,8 +53,15 @@ class _EditDataPageState extends State<EditDataPage> {
     yAxis = widget.data.yAxis;
     zAxis = widget.data.zAxis;
     memo = widget.data.memo ?? '';
-    image = widget.data.image ?? '';
     type = widget.data.type ?? TypeList.others.name;
+    image = widget.data.image ?? '';
+
+    Future(() async {
+      if (image.isNotEmpty) {
+        _imageFile = await ImageManager.getImage(image);
+        setState(() {});
+      }
+    });
   }
 
   @override
@@ -68,7 +83,6 @@ class _EditDataPageState extends State<EditDataPage> {
         );
       });
     }
-    ;
 
     return ConstrainedBox(
       constraints: BoxConstraints(
@@ -88,9 +102,22 @@ class _EditDataPageState extends State<EditDataPage> {
               ),
             ),
           ),
-          // ×ボタン
           Stack(
             children: [
+              // 削除ボタン
+              Container(
+                alignment: Alignment.centerLeft,
+                margin: const EdgeInsets.only(left:5),
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                      primary: Colors.redAccent,
+                      onPrimary: Colors.black,
+                      elevation: 8),
+                  onPressed: _delete,
+                  child: const Text('削除'),
+                ),
+              ),
+              // タイトル
               Container(
                 alignment: Alignment.center,
                 child: const Text(
@@ -102,6 +129,7 @@ class _EditDataPageState extends State<EditDataPage> {
                   ),
                 ),
               ),
+              // ×ボタン
               Container(
                 alignment: Alignment.centerRight,
                 child: IconButton(
@@ -128,12 +156,33 @@ class _EditDataPageState extends State<EditDataPage> {
                       margin: const EdgeInsets.only(left: 5, right: 5),
                       child: Column(
                         children: [
-                          Container(
-                            height: 250,
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.red),
-                              borderRadius: BorderRadius.circular(10),
+                          InkWell(
+                            child: Container(
+                              child: _imageFile == null 
+                              // 画像がないとき
+                              ? Container(
+                                  alignment: Alignment.center,
+                                  height: 250,
+                                  decoration: const BoxDecoration(
+                                    color: Colors.grey,
+                                  ),
+                                  child: const Text('タップで画像を追加', style: TextStyle(color: Colors.white)),
+                                )
+                                // 画像が設定されたとき
+                              : Container(
+                                  alignment: Alignment.center,
+                                  height: 250,
+                                  child: Image.file(_imageFile!),
+                                )
                             ),
+                            onTap:() async {
+                              final pickImage = await ImagePicker().pickImage(source: ImageSource.gallery);
+                              if (pickImage == null) return;
+                              setState(() {
+                                _imageFile = File(pickImage.path);
+                                imageChangeFlg = true;
+                              });
+                            },
                           ),
                           // タイプの選択
                           Row(
@@ -311,18 +360,65 @@ class _EditDataPageState extends State<EditDataPage> {
   void _saved() {
     if (_formKey.currentState!.validate()) {
       _formKey.currentState!.save();
+
+      // 画像が変更されていれば更新
+      if (_imageFile != null && imageChangeFlg) {
+        if (image.isEmpty) {
+          image = DateFormat('yyyyMMddHHmmss').format(DateTime.now()).toString();
+        }
+        ImageManager.saveImage(_imageFile!, image);
+      }
+      
       DataModel data = DataModel(
         id: id,
         xAxis: xAxis,
         yAxis: yAxis,
         zAxis: zAxis,
         memo: memo,
-        image: '',
+        image: image,
         type: type,
       );
       DataListProvider provider = context.read<DataListProvider>();
       provider.updateDataList(data);
       Navigator.of(context).pop();
+    }
+  }
+
+  void _delete() async {
+    var result = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return CupertinoAlertDialog(
+            title: const Text("確認"),
+            content: const Text("このデータを削除してもよろしいですか"),
+            actions: <Widget>[
+              CupertinoDialogAction(
+                isDestructiveAction: true,
+                onPressed: () {
+                  Navigator.of(context).pop(false);
+                },
+                child: const Text('キャンセル'),
+              ),
+              CupertinoDialogAction(
+                onPressed: () {
+                  Navigator.of(context).pop(true);
+                },
+                child: const Text('OK'),
+              ),
+            ]);
+      },
+    );
+    if (context.mounted) {
+      if (result) {
+        DataListProvider provider = context.read<DataListProvider>();
+        provider.deleteDataList(widget.data);
+        // 画像が設定されていれば削除
+        String image = widget.data.image ?? '';
+        if (image.isNotEmpty) {
+          ImageManager.deleteImage(image);
+        }
+        Navigator.of(context).pop();
+      }
     }
   }
 }
