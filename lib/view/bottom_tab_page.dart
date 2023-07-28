@@ -24,7 +24,10 @@ class _BottomTabPageState extends State<BottomTabPage> {
     super.initState();
     // データリストの初期化
     DataListProvider provider = context.read<DataListProvider>();
-    provider.init();
+    Future (() async {
+      provider.init();
+      setState(() {});
+    });
   }
   
   @override
