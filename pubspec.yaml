@@ -21,6 +21,11 @@ version: 1.0.0+1
 environment:
   sdk: '>=2.19.6 <3.0.0'
 
+flutter_icons:       
+  android: true
+  ios: true
+  image_path: "assets/sandbox_icon.png"
+
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
 # consider running `flutter pub upgrade --major-versions`. Alternatively,
@@ -43,6 +48,7 @@ dependencies:
   path_provider: ^2.0.15
   intl: ^0.18.1
   image_picker: ^1.0.1
+  flutter_launcher_icons: ^0.13.1
 
 dev_dependencies:
   flutter_test:
