@@ -1,12 +1,7 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:sandbox_manager/model/data_model_project.dart';
 import 'package:provider/provider.dart';
 
-import '../model/database_manager.dart';
-import '../provider/data_list_provider.dart';
 import '../provider/project_list_provider.dart';
 
 class AddProjectPage extends StatelessWidget {

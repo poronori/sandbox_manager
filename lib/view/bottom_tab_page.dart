@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:sandbox_manager/provider/data_list_provider.dart';
 import 'package:sandbox_manager/view/project_list_page.dart';
 
-import '../model/data_model_project.dart';
 import '../provider/project_list_provider.dart';
 import 'add_data_page.dart';
 import 'map_page.dart';
@@ -22,6 +21,13 @@ class _BottomTabPageState extends State<BottomTabPage> {
   int _currentIndex = 0;
   final _pageWidgets = [const DataListPage(), const MapPage()];
   
+  @override
+  void initState() {
+    super.initState();
+    ProjectListProvider projectProvider = context.read<ProjectListProvider>();
+    projectProvider.init();
+  }
+
   @override
   Widget build(BuildContext context) {
     DataListProvider dataProvider = context.watch<DataListProvider>();
@@ -58,7 +64,7 @@ class _BottomTabPageState extends State<BottomTabPage> {
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
       ),
-      drawer: const Drawer(child: ProjectListPage()),
+      drawer: const Drawer(backgroundColor: Colors.white70, child: ProjectListPage()),
     );
   }
 

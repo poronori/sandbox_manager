@@ -6,6 +6,7 @@ import 'package:sandbox_manager/view/edit_data_page.dart';
 import '../model/data_model.dart';
 import '../model/image_manager.dart';
 import '../provider/data_list_provider.dart';
+import '../provider/project_list_provider.dart';
 
 class DataListPage extends StatelessWidget {
   const DataListPage({super.key});
@@ -13,7 +14,15 @@ class DataListPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     DataListProvider provider = context.watch<DataListProvider>();
+    ProjectListProvider projectProvider = context.watch<ProjectListProvider>();
 
+    if (projectProvider.dataList.isEmpty) {
+      return const Center(child:Text('左上のメニューボタンよりプロジェクトを作成してください'));
+    } else if (provider.currentProject.isEmpty) {
+      return const Center(child:Text('左上のメニューボタンよりプロジェクトを選択してください'));
+    } else if (provider.dataList.isEmpty) {
+      return const Center(child:Text('右上の+ボタンよりデータを追加してください'));
+    } else {
     return ListView.builder(
         itemCount: provider.dataList.length,
         itemBuilder: (context, index) {
@@ -102,5 +111,6 @@ class DataListPage extends StatelessWidget {
             ),
           );
         });
+    }
   }
 }

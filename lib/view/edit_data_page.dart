@@ -2,17 +2,12 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/placeholder.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:sandbox_manager/model/image_manager.dart';
-import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 import 'package:provider/provider.dart';
 
 import '../model/data_model.dart';
-import '../model/database_manager.dart';
 import '../provider/data_list_provider.dart';
 import '../view_model/add_data_model.dart';
 

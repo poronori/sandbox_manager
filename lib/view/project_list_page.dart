@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../model/data_model_project.dart';
-import '../model/database_manager.dart';
 import '../provider/data_list_provider.dart';
 import '../provider/project_list_provider.dart';
 import 'add_project_page.dart';
@@ -16,9 +15,26 @@ class ProjectListPage extends StatelessWidget {
     ProjectListProvider provider = context.watch<ProjectListProvider>();
     return Column(
       children: [
+        const SizedBox(
+          width: double.infinity,
+          child: DrawerHeader(
+            margin: EdgeInsets.only(bottom: 2),
+            decoration: BoxDecoration(
+              color: Colors.orangeAccent,
+            ),
+            child: Text(
+              'プロジェクト一覧',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+              ),
+            ),
+          ),
+        ),
         Flexible(
           child: ListView.builder(
             itemCount: provider.dataList.length,
+            padding: const EdgeInsets.only(top: 0),
             itemBuilder: (context, index) {
               DataModelProject data = provider.dataList[index];
             
@@ -61,6 +77,7 @@ class ProjectListPage extends StatelessWidget {
                 },
                 // 表示項目
                 child: Card(
+                  margin: EdgeInsets.all(2),
                   child: ListTile(
                     title: Text(
                       data.projectName,
@@ -75,6 +92,10 @@ class ProjectListPage extends StatelessWidget {
                       dataProvider.setTable(data.id!);
                       Navigator.pop(context);
                     },
+                    tileColor: Colors.white,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                    ),
                   ),
                 ),
               );
@@ -95,7 +116,9 @@ class ProjectListPage extends StatelessWidget {
                   builder: (context) => const AddProjectPage(),
                 );
             },
-            child: const Text('新規作成'),
+            child: const Text(
+              '新規作成',
+              style: TextStyle(color: Colors.white, fontSize: 20)),
           ),
         )
       ]
