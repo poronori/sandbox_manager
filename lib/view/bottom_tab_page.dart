@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sandbox_manager/provider/data_list_provider.dart';
+import 'package:sandbox_manager/view/project_list_page.dart';
 
+import '../model/data_model_project.dart';
+import '../provider/project_list_provider.dart';
 import 'add_data_page.dart';
 import 'map_page.dart';
 import 'data_list_page.dart';
@@ -18,36 +21,29 @@ class BottomTabPage extends StatefulWidget {
 class _BottomTabPageState extends State<BottomTabPage> {
   int _currentIndex = 0;
   final _pageWidgets = [const DataListPage(), const MapPage()];
-
-  @override
-  void initState(){
-    super.initState();
-    // データリストの初期化
-    DataListProvider provider = context.read<DataListProvider>();
-    Future (() async {
-      provider.init();
-      setState(() {});
-    });
-  }
   
   @override
   Widget build(BuildContext context) {
+    DataListProvider dataProvider = context.watch<DataListProvider>();
     return Scaffold(
       appBar: AppBar(
-        title: const Text('SandBox Manager'),
+        title: Text(dataProvider.currentProject),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () async {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                shape: const RoundedRectangleBorder(
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-                ),
-                builder: (context) => const AddDataPage(),
-              );
-            },
+          Visibility(
+            visible: dataProvider.currentProject.isNotEmpty, // プロジェクトが選択されていれば表示
+            child: IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () async {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
+                  ),
+                  builder: (context) => const AddDataPage(),
+                );
+              },
+            ),
           ),
         ],
       ),
@@ -62,6 +58,7 @@ class _BottomTabPageState extends State<BottomTabPage> {
         onTap: _onItemTapped,
         type: BottomNavigationBarType.fixed,
       ),
+      drawer: const Drawer(child: ProjectListPage()),
     );
   }
 

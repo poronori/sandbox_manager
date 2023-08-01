@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:sandbox_manager/provider/data_list_provider.dart';
+import 'package:sandbox_manager/provider/project_list_provider.dart';
 import 'view/bottom_tab_page.dart';
 
 void main() {
@@ -8,6 +9,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => DataListProvider()),
+        ChangeNotifierProvider(create: (_) => ProjectListProvider()),
       ],
       child: const MyApp()),
   );

@@ -198,7 +198,7 @@ class _AddDataPageState extends State<AddDataPage> {
                                           borderRadius:
                                               BorderRadius.circular(15),
                                           borderSide: const BorderSide(
-                                            color: Colors.blue,
+                                            color: Colors.deepOrange,
                                           ),
                                         ),
                                         labelText: 'x座標',
@@ -225,7 +225,7 @@ class _AddDataPageState extends State<AddDataPage> {
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(15),
                                         borderSide: const BorderSide(
-                                          color: Colors.blue,
+                                          color: Colors.deepOrange,
                                         ),
                                       ),
                                       labelText: 'y座標',
@@ -256,7 +256,7 @@ class _AddDataPageState extends State<AddDataPage> {
                                           borderRadius:
                                               BorderRadius.circular(15),
                                           borderSide: const BorderSide(
-                                            color: Colors.blue,
+                                            color: Colors.deepOrange,
                                           ),
                                         ),
                                         labelText: 'z座標',
@@ -281,7 +281,7 @@ class _AddDataPageState extends State<AddDataPage> {
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
                                     borderSide: const BorderSide(
-                                      color: Colors.blue,
+                                      color: Colors.deepOrange,
                                     ),
                                   ),
                                   labelText: 'メモ',

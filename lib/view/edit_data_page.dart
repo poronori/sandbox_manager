@@ -239,7 +239,7 @@ class _EditDataPageState extends State<EditDataPage> {
                                           borderRadius:
                                               BorderRadius.circular(15),
                                           borderSide: const BorderSide(
-                                            color: Colors.blue,
+                                            color: Colors.deepOrange,
                                           ),
                                         ),
                                         labelText: 'x座標',
@@ -267,7 +267,7 @@ class _EditDataPageState extends State<EditDataPage> {
                                       focusedBorder: OutlineInputBorder(
                                         borderRadius: BorderRadius.circular(15),
                                         borderSide: const BorderSide(
-                                          color: Colors.blue,
+                                          color: Colors.deepOrange,
                                         ),
                                       ),
                                       labelText: 'y座標',
@@ -299,7 +299,7 @@ class _EditDataPageState extends State<EditDataPage> {
                                           borderRadius:
                                               BorderRadius.circular(15),
                                           borderSide: const BorderSide(
-                                            color: Colors.blue,
+                                            color: Colors.deepOrange,
                                           ),
                                         ),
                                         labelText: 'z座標',
@@ -325,7 +325,7 @@ class _EditDataPageState extends State<EditDataPage> {
                                   focusedBorder: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(15),
                                     borderSide: const BorderSide(
-                                      color: Colors.blue,
+                                      color: Colors.deepOrange,
                                     ),
                                   ),
                                   labelText: 'メモ',
