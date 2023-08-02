@@ -1,21 +1,38 @@
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:sandbox_manager/model/data_model_project.dart';
 import 'package:provider/provider.dart';
 
 import '../provider/project_list_provider.dart';
 
-class AddProjectPage extends StatelessWidget {
+class AddProjectPage extends StatefulWidget {
   const AddProjectPage({super.key});
+
+  @override
+  State<AddProjectPage> createState() => _AddProjectPageState();
+}
+
+class _AddProjectPageState extends State<AddProjectPage> {
+
+  String projectName = '';
+  bool errorflg = false;
 
   @override
   Widget build(BuildContext context) {
     ProjectListProvider provider = context.read<ProjectListProvider>();
-    String projectName = '';
+
 
     void _save() async {
-      // プロジェクト管理テーブルに挿入
-      DataModelProject data = DataModelProject(projectName: projectName);
-      provider.addDataList(data);
+      if (projectName.isEmpty) {
+        setState(() {
+          errorflg = true;
+        });
+      } else {
+        // プロジェクト管理テーブルに挿入
+        DataModelProject data = DataModelProject(projectName: projectName);
+        provider.addDataList(data);
+        Navigator.of(context).pop(true);
+      }
     }
 
     return CupertinoAlertDialog(
@@ -31,9 +48,16 @@ class AddProjectPage extends StatelessWidget {
             ),
           ),
           CupertinoTextField(
-            onChanged: (value) async {
-              projectName = value;
+            onChanged: (value) {
+              setState(() {
+                projectName = value;
+                errorflg = false;
+              });
             }),
+          Visibility(
+            visible: errorflg,
+            child: const Text('プロジェクト名が空です。', style:TextStyle(color: Colors.red)),
+          ),
         ],
       ),
       actions: <Widget>[
@@ -47,7 +71,6 @@ class AddProjectPage extends StatelessWidget {
         CupertinoDialogAction(
           onPressed: () {
             _save();
-            Navigator.of(context).pop(true);
           },
           child: const Text('OK'),
         ),
