@@ -6,6 +6,7 @@ import '../model/data_model_project.dart';
 import '../provider/data_list_provider.dart';
 import '../provider/project_list_provider.dart';
 import 'add_project_page.dart';
+import 'edit_project_page.dart';
 
 class ProjectListPage extends StatelessWidget {
   const ProjectListPage({super.key});
@@ -76,25 +77,33 @@ class ProjectListPage extends StatelessWidget {
                   );
                 },
                 // 表示項目
-                child: Card(
-                  margin: EdgeInsets.all(2),
-                  child: ListTile(
-                    title: Text(
-                      data.projectName,
-                      style: const TextStyle(fontSize: 25),
-                      overflow: TextOverflow.ellipsis, // 名前が長すぎる場合は切る
-                    ),
-                    onTap:() {
-                      print('tap!!${data.projectName}');
-                      // タップされたプロジェクトの内容を表示
-                      DataListProvider dataProvider = context.read<DataListProvider>();
-                      dataProvider.setProject(data.projectName);
-                      dataProvider.setTable(data.id!);
-                      Navigator.pop(context);
-                    },
-                    tileColor: Colors.white,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: BorderRadius.all(Radius.circular(10)),
+                child: GestureDetector(
+                  onLongPress: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => EditProjectPage(data: data),
+                    );
+                  },
+                  child: Card(
+                    margin: const EdgeInsets.all(2),
+                    child: ListTile(
+                      title: Text(
+                        data.projectName,
+                        style: const TextStyle(fontSize: 25),
+                        overflow: TextOverflow.ellipsis, // 名前が長すぎる場合は切る
+                      ),
+                      onTap:() {
+                        print('tap!!${data.projectName}');
+                        // タップされたプロジェクトの内容を表示
+                        DataListProvider dataProvider = context.read<DataListProvider>();
+                        dataProvider.setProject(data.projectName);
+                        dataProvider.setTable(data.id!);
+                        Navigator.pop(context);
+                      },
+                      tileColor: Colors.white,
+                      shape: const RoundedRectangleBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                      ),
                     ),
                   ),
                 ),
