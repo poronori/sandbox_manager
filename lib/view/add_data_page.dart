@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 
 import '../model/data_model.dart';
 import '../model/image_manager.dart';
@@ -24,9 +25,14 @@ class _AddDataPageState extends State<AddDataPage> {
   String memo = '';
   String type = TypeList.others.name;
   File? _image;
+  RecognizedText? _recognizedText;
 
   final _formKey = GlobalKey<FormState>();
   final _scrollController = ScrollController();
+  final _textRecognizer = TextRecognizer(script: TextRecognitionScript.japanese);
+  final _xAxisController = TextEditingController();
+  final _yAxisController = TextEditingController();
+  final _zAxisController = TextEditingController();
 
   @override
   void dispose() {
@@ -134,6 +140,15 @@ class _AddDataPageState extends State<AddDataPage> {
                             onTap:() async {
                               final image = await ImagePicker().pickImage(source: ImageSource.gallery);
                               if (image == null) return;
+
+                              // 画像からテキストの読み取り
+                              final inputImage = InputImage.fromFilePath(image.path);
+                              _recognizedText = await _textRecognizer.processImage(inputImage);
+                              if (_recognizedText != null && _recognizedText!.text.isNotEmpty) {
+                                String text = _recognizedText!.text;
+                                changeAxisText(text);
+                              }
+
                               setState(() {
                                 _image = File(image.path);
                               });
@@ -176,6 +191,7 @@ class _AddDataPageState extends State<AddDataPage> {
                                   margin:
                                       const EdgeInsets.fromLTRB(5, 0, 5, 0),
                                   child: TextFormField(
+                                      controller: _xAxisController,
                                       keyboardType: TextInputType.number,
                                       textInputAction: TextInputAction.next,
                                       autovalidateMode:
@@ -205,6 +221,7 @@ class _AddDataPageState extends State<AddDataPage> {
                               ),
                               Flexible(
                                 child: TextFormField(
+                                    controller: _yAxisController,
                                     keyboardType: TextInputType.number,
                                     textInputAction: TextInputAction.next,
                                     autovalidateMode:
@@ -234,6 +251,7 @@ class _AddDataPageState extends State<AddDataPage> {
                                   margin:
                                       const EdgeInsets.fromLTRB(5, 0, 5, 0),
                                   child: TextFormField(
+                                      controller: _zAxisController,
                                       keyboardType: TextInputType.number,
                                       textInputAction: TextInputAction.next,
                                       autovalidateMode:
@@ -332,6 +350,41 @@ class _AddDataPageState extends State<AddDataPage> {
       DataListProvider provider = context.read<DataListProvider>();
       provider.addDataList(data);
       Navigator.of(context).pop();
+    }
+  }
+
+  void changeAxisText(String readText) {
+    // 改行文字で分割する
+    List<String> splitText = readText.split('\n');
+    for(int i = 0; i < splitText.length; i++) {
+      print(splitText[i]);
+      // 座標の文字列を検索
+      if (splitText[i].contains('位置')) {
+        String axisText = splitText[i];
+        // 必要のない文字列を削除しておく
+        axisText = axisText.replaceAll('位置', '');
+        axisText = axisText.replaceAll(':', '');
+        axisText = axisText.replaceAll('：', '');
+        axisText = axisText.replaceAll(' ', '');
+        axisText = axisText.replaceAll('　', '');
+        // 全角だった場合は半角にしておく
+        axisText = axisText.replaceAll('、', ',');
+
+        // 座標毎に分割
+        List<String> axisTextList = axisText.split(',');
+        if (axisTextList.length == 3) {
+          // 数値に変換できるものだけテキストに入力する
+          if(double.tryParse(axisTextList[0]) != null) {
+            _xAxisController.text = axisTextList[0];
+          }
+          if(double.tryParse(axisTextList[1]) != null) {
+            _yAxisController.text = axisTextList[1];
+          }
+          if(double.tryParse(axisTextList[2]) != null) {
+            _zAxisController.text = axisTextList[2];
+          }
+        }
+      }
     }
   }
 }

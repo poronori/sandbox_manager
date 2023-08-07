@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:sandbox_manager/model/image_manager.dart';
 import 'package:provider/provider.dart';
+import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 
 import '../model/data_model.dart';
 import '../provider/data_list_provider.dart';
@@ -30,9 +31,14 @@ class _EditDataPageState extends State<EditDataPage> {
   String image = '';
   File? _imageFile;
   bool imageChangeFlg = false; // 画像が変更されたか
+  RecognizedText? _recognizedText;
 
   final _formKey = GlobalKey<FormState>();
   final _scrollController = ScrollController();
+  final _textRecognizer = TextRecognizer(script: TextRecognitionScript.japanese);
+  final _xAxisController = TextEditingController();
+  final _yAxisController = TextEditingController();
+  final _zAxisController = TextEditingController();
 
   @override
   void dispose() {
@@ -47,6 +53,9 @@ class _EditDataPageState extends State<EditDataPage> {
     xAxis = widget.data.xAxis;
     yAxis = widget.data.yAxis;
     zAxis = widget.data.zAxis;
+    _xAxisController.text = xAxis;
+    _yAxisController.text = yAxis;
+    _zAxisController.text = zAxis;
     memo = widget.data.memo ?? '';
     type = widget.data.type ?? TypeList.others.name;
     image = widget.data.image ?? '';
@@ -173,6 +182,14 @@ class _EditDataPageState extends State<EditDataPage> {
                             onTap:() async {
                               final pickImage = await ImagePicker().pickImage(source: ImageSource.gallery);
                               if (pickImage == null) return;
+
+                              // 画像からテキストの読み取り
+                              final inputImage = InputImage.fromFilePath(pickImage.path);
+                              _recognizedText = await _textRecognizer.processImage(inputImage);
+                              if (_recognizedText != null && _recognizedText!.text.isNotEmpty) {
+                                String text = _recognizedText!.text;
+                                changeAxisText(text);
+                              }
                               setState(() {
                                 _imageFile = File(pickImage.path);
                                 imageChangeFlg = true;
@@ -216,7 +233,7 @@ class _EditDataPageState extends State<EditDataPage> {
                                   margin:
                                       const EdgeInsets.fromLTRB(5, 0, 5, 0),
                                   child: TextFormField(
-                                      initialValue: xAxis,
+                                      controller: _xAxisController,
                                       keyboardType: TextInputType.number,
                                       textInputAction: TextInputAction.next,
                                       autovalidateMode:
@@ -246,7 +263,7 @@ class _EditDataPageState extends State<EditDataPage> {
                               ),
                               Flexible(
                                 child: TextFormField(
-                                    initialValue: yAxis,
+                                    controller: _yAxisController,
                                     keyboardType: TextInputType.number,
                                     textInputAction: TextInputAction.next,
                                     autovalidateMode:
@@ -276,7 +293,7 @@ class _EditDataPageState extends State<EditDataPage> {
                                   margin:
                                       const EdgeInsets.fromLTRB(5, 0, 5, 0),
                                   child: TextFormField(
-                                      initialValue: zAxis,
+                                      controller: _zAxisController,
                                       keyboardType: TextInputType.number,
                                       textInputAction: TextInputAction.next,
                                       autovalidateMode:
@@ -413,6 +430,41 @@ class _EditDataPageState extends State<EditDataPage> {
           ImageManager.deleteImage(image);
         }
         Navigator.of(context).pop();
+      }
+    }
+  }
+
+  void changeAxisText(String readText) {
+    // 改行文字で分割する
+    List<String> splitText = readText.split('\n');
+    for(int i = 0; i < splitText.length; i++) {
+      print(splitText[i]);
+      // 座標の文字列を検索
+      if (splitText[i].contains('位置')) {
+        String axisText = splitText[i];
+        // 必要のない文字列を削除しておく
+        axisText = axisText.replaceAll('位置', '');
+        axisText = axisText.replaceAll(':', '');
+        axisText = axisText.replaceAll('：', '');
+        axisText = axisText.replaceAll(' ', '');
+        axisText = axisText.replaceAll('　', '');
+        // 全角だった場合は半角にしておく
+        axisText = axisText.replaceAll('、', ',');
+
+        // 座標毎に分割
+        List<String> axisTextList = axisText.split(',');
+        if (axisTextList.length == 3) {
+          // 数値に変換できるものだけテキストに入力する
+          if(double.tryParse(axisTextList[0]) != null) {
+            _xAxisController.text = axisTextList[0];
+          }
+          if(double.tryParse(axisTextList[1]) != null) {
+            _yAxisController.text = axisTextList[1];
+          }
+          if(double.tryParse(axisTextList[2]) != null) {
+            _zAxisController.text = axisTextList[2];
+          }
+        }
       }
     }
   }
