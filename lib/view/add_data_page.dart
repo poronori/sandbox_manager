@@ -370,7 +370,7 @@ class _AddDataPageState extends State<AddDataPage> {
     // 画像からテキストを読み取る
     final inputImage = InputImage.fromFilePath(imagePath);
     _recognizedText = await _textRecognizer.processImage(inputImage);
-    
+
     if (_recognizedText != null && _recognizedText!.text.isNotEmpty) {
       String readText = _recognizedText!.text;
       // 改行文字で分割する
@@ -382,12 +382,10 @@ class _AddDataPageState extends State<AddDataPage> {
           String axisText = splitText[i];
           // 必要のない文字列を削除しておく
           axisText = axisText.replaceAll('位置', '');
-          axisText = axisText.replaceAll(':', '');
-          axisText = axisText.replaceAll('：', '');
+          axisText = axisText.trim();
+          axisText = axisText.toLowerCase();
           axisText = axisText.replaceAll(' ', '');
-          axisText = axisText.replaceAll('　', '');
-          // 全角だった場合は半角にしておく
-          axisText = axisText.replaceAll('、', ',');
+          axisText = axisText.replaceAll(':', '');
 
           // 座標毎に分割
           List<String> axisTextList = axisText.split(',');

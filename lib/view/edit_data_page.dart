@@ -465,12 +465,10 @@ class _EditDataPageState extends State<EditDataPage> {
           String axisText = splitText[i];
           // 必要のない文字列を削除しておく
           axisText = axisText.replaceAll('位置', '');
-          axisText = axisText.replaceAll(':', '');
-          axisText = axisText.replaceAll('：', '');
+          axisText = axisText.trim();
+          axisText = axisText.toLowerCase();
           axisText = axisText.replaceAll(' ', '');
-          axisText = axisText.replaceAll('　', '');
-          // 全角だった場合は半角にしておく
-          axisText = axisText.replaceAll('、', ',');
+          axisText = axisText.replaceAll(':', '');
 
           // 座標毎に分割
           List<String> axisTextList = axisText.split(',');
