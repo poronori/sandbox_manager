@@ -24,7 +24,7 @@ class _MapPageState extends State<MapPage> {
     // zoom値16を起点にして、ピクセル座標を計算する
     int zoom = tile.coordinates.z;
     num xAxis = pow(2, (16 - zoom)) * tile.coordinates.x * 256;
-    num zAxis = pow(2, (16 - zoom)) * tile.coordinates.y * -256;
+    num zAxis = pow(2, (16 - zoom)) * tile.coordinates.y * 256;
 
     return Stack(
       fit: StackFit.expand, // zoomしたときの歪みを消す
@@ -68,7 +68,7 @@ class _MapPageState extends State<MapPage> {
           markers: provider.dataList.map((DataModel data){
 
             double xAxis = double.parse(data.xAxis);
-            double zAxis = double.parse(data.zAxis) * -1; // タイルの左上が0点になるため反転させる
+            double zAxis = double.parse(data.zAxis); // タイルの左上が0点になるため反転させる
             // ズーム値16.0の時に1タイルの1辺256mとして描画
             latLng.LatLng? xy = crs.pointToLatLng(CustomPoint(xAxis, zAxis), 16);
 
